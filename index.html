@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Player Video</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css"/>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    video {
+      width: 100%;
+      max-width: 800px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <video id="player" controls playsinline></video>
+
+  <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.polyfilled.js"></script>
+  <script>
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    const encodedLink = getParam('link');
+    const format = getParam('format') || 'video/mp4';
+
+    if (encodedLink) {
+      const src = `https://playerv2.kinikita-xyz.workers.dev/?link=${encodedLink}`;
+      const video = document.getElementById('player');
+      video.src = src;
+      video.type = format;
+      const player = new Plyr(video);
+    } else {
+      document.body.innerHTML = "<p style='color:white;text-align:center'>Tidak ada link video</p>";
+    }
+  </script>
+</body>
+</html>
