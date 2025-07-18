@@ -28,45 +28,45 @@
   <video id="player" controls playsinline></video>
 
   <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.polyfilled.js"></script>
-  <script>
-    function getParam(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
-    }
-
-    const encodedLink = getParam('link');
-    const format = getParam('format') || 'video/mp4';
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const poster = urlParams.get("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiYzBhmztUhTVnNVhBKG_LVCHCf-gpeXWrXv-hWDzFBRJRO346vRyXiATNdr1N0Yh7xqJS7s5ABV04yDB1W3iiREVJu2QzEu04a2qW_Y7k-RrbYyXFT60AW3L_LGCh9oi5kDswAfCYOQmMOyoPaiz1XIrqjkE-t403-K3m0WdQGyBL8jZVG0qwc1mKv2E1n/s720/player.webp");
-  const adsTitle = urlParams.get("galaksion");
-  const adsImage = urlParams.get("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhd9RO6bcNcIL6tNUmlHSDVVWUd3jBgsikSEyKnGVpWjpH1AEeyEmw06-_RCnaKeKgNuaErQXzHwotIQBsyIVPg1dn5f77WBuJqlRfWNODm4ctNgNy3UGzPKVdGxreI7PisqF1AgKhehsv2pZslXB4LrOrsgTIZONePU1b4r9WTekyJhuDftEnhmEg3AMFH/s360/hadiah.png");
-  const adsUrl = urlParams.get("https://www.profitableratecpm.com/m1kgqspa?key=c5eef6688eea8775dc79a788b5b6146b");
-
-  if (poster && window.player) {
-    player.poster = poster;
+<script>
+  function getParam(name) {
+    const url = new URL(window.location.href);
+    return url.searchParams.get(name);
   }
 
-  if (adsTitle && adsImage && adsUrl) {
-    const adBox = document.createElement("div");
-    adBox.innerHTML = `
-      <a href="${adsUrl}" target="_blank" style="display:block;text-align:center;margin:10px auto;">
-        <img src="${adsImage}" alt="${adsTitle}" style="max-width:100%;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.15);">
-      </a>
-    `;
-    document.body.insertBefore(adBox, document.body.firstChild); // tampil di atas player
-  }
+  const encodedLink = getParam('link');
+  const format = getParam('format') || 'video/mp4';
+  const poster = getParam('poster');
+  const adsTitle = getParam('ads_title');
+  const adsImage = getParam('ads_image');
+  const adsUrl = getParam('ads_url');
 
-    if (encodedLink) {
-      const src = `https://playerv2.kinikita-xyz.workers.dev/?link=${encodedLink}`;
-      const video = document.getElementById('player');
-      video.src = src;
-      video.type = format;
-      const player = new Plyr(video);
-    } else {
-      document.body.innerHTML = "<p style='color:white;text-align:center'>Tidak ada link video</p>";
+  if (encodedLink) {
+    const src = `https://playerv2.kinikita-xyz.workers.dev/?link=${encodedLink}`;
+    const video = document.getElementById('player');
+    video.src = src;
+    video.type = format;
+
+    if (poster) {
+      video.setAttribute('poster', poster);
     }
-    
-  </script>
+
+    const player = new Plyr(video);
+
+    // Tampilkan iklan jika tersedia
+    if (adsImage && adsUrl) {
+      const adBox = document.createElement("div");
+      adBox.innerHTML = `
+        <a href="${adsUrl}" target="_blank" style="display:block;text-align:center;margin:10px auto;">
+          <img src="${adsImage}" alt="${adsTitle || 'Iklan'}" style="max-width:100%;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+        </a>
+      `;
+      document.body.insertBefore(adBox, document.body.firstChild);
+    }
+
+  } else {
+    document.body.innerHTML = "<p style='color:white;text-align:center'>Tidak ada link video</p>";
+  }
+</script>
 </body>
 </html>
