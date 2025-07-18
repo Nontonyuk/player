@@ -17,41 +17,42 @@
     .container {
       max-width: 800px;
       width: 100%;
-      position: relative;
     }
     .ads {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     .ads img {
       width: 100%;
       max-width: 728px;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      user-drag: none;
-      -webkit-user-drag: none;
     }
-    #closeAd {
-      margin-top: 10px;
+    .close-ad-btn {
+      margin: 10px auto;
       background: red;
-      color: white;
-      padding: 10px 20px;
+      color: #fff;
       border: none;
-      cursor: pointer;
+      padding: 10px 20px;
       border-radius: 5px;
+      cursor: pointer;
     }
-    video {
-      width: 100%;
+    video.hidden {
+      visibility: hidden;
+      pointer-events: none;
+      height: 0;
+    }
+    video.visible {
+      visibility: visible;
+      pointer-events: auto;
       height: auto;
-      border-radius: 10px;
-      display: none;
     }
   </style>
 </head>
-<body oncontextmenu="return false">
+<body>
   <div class="container">
     <div class="ads" id="adsContainer"></div>
-    <video id="player" controls playsinline></video>
+    <video id="player" class="hidden" controls playsinline preload="none"></video>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.polyfilled.js"></script>
@@ -67,46 +68,49 @@
     const adsTitle = getParam('ads_title');
     const adsImage = getParam('ads_image');
     const adsUrl = getParam('ads_url');
-    const player = document.getElementById('player');
+
+    const video = document.getElementById('player');
     const adsContainer = document.getElementById('adsContainer');
 
-    if (poster) player.setAttribute('poster', poster);
-
-    if (encodedLink) {
-      const src = `https://playerv2.kinikita-xyz.workers.dev/?link=${encodedLink}`;
-      player.src = src;
-      player.type = format;
-      new Plyr(player);
-    } else {
+    if (!encodedLink) {
       document.body.innerHTML = "<p style='color:white;text-align:center'>Tidak ada link video</p>";
+      throw new Error("Link kosong.");
     }
 
-    // Iklan logic
-    if (adsImage && adsUrl) {
-      adsContainer.innerHTML = `
-        <a href="${adsUrl}" target="_blank">
-          <img src="${adsImage}" alt="${adsTitle || 'Iklan'}" draggable="false">
-        </a><br>
-        <button id="closeAd">Tutup Iklan</button>
+    const videoSrc = `https://playerv2.kinikita-xyz.workers.dev/?link=${encodedLink}`;
+    video.setAttribute('data-src', videoSrc);
+    video.setAttribute('type', format);
+    if (poster) video.setAttribute('poster', poster);
+
+    if (adsImage) {
+      const adHTML = `
+        <a href="${adsUrl || '#'}" target="_blank">
+          <img src="${adsImage}" alt="${adsTitle || 'Iklan'}">
+        </a>
+        <button id="closeAd" class="close-ad-btn">Tutup Iklan</button>
       `;
+      adsContainer.innerHTML = adHTML;
 
       document.getElementById('closeAd').addEventListener('click', () => {
         adsContainer.style.display = 'none';
-        player.style.display = 'block';
+        video.classList.remove('hidden');
+        video.classList.add('visible');
+        video.src = video.getAttribute('data-src');
+        new Plyr(video);
       });
     } else {
-      player.style.display = 'block'; // tampilkan langsung kalau tidak ada iklan
+      // tidak ada iklan, langsung tampilkan player
+      video.classList.remove('hidden');
+      video.classList.add('visible');
+      video.src = videoSrc;
+      new Plyr(video);
     }
 
-    // 🔐 Proteksi ringan anti inspect
-    document.addEventListener('keydown', function(e) {
-      if (
-        e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J")) ||
-        (e.ctrlKey && e.key === "U")
-      ) {
+    // Proteksi ringan
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F12' || (e.ctrlKey && ['u', 'U', 's', 'S'].includes(e.key))) {
         e.preventDefault();
-        alert("Fungsi ini dinonaktifkan.");
       }
     });
   </script>
