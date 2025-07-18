@@ -8,65 +8,77 @@
   <style>
     body {
       margin: 0;
-      padding: 0;
+      padding: 20px;
       background: #000;
-      color: #fff;
       font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
-      align-items: center;
-      height: 100vh;
+    }
+    .container {
+      max-width: 800px;
+      width: 100%;
+    }
+    .ads {
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .ads img {
+      width: 100%;
+      max-width: 728px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
     video {
       width: 100%;
-      max-width: 800px;
       height: auto;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
-  <video id="player" controls playsinline></video>
+  <div class="container">
+    <div class="ads" id="adsContainer"></div>
+    <video id="player" controls playsinline></video>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.polyfilled.js"></script>
-<script>
-  function getParam(name) {
-    const url = new URL(window.location.href);
-    return url.searchParams.get(name);
-  }
+  <script>
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
 
-  const encodedLink = getParam('link');
-  const format = getParam('format') || 'video/mp4';
-  const poster = getParam('poster');
-  const adsTitle = getParam('ads_title');
-  const adsImage = getParam('ads_image');
-  const adsUrl = getParam('ads_url');
+    const encodedLink = getParam('link');
+    const format = getParam('format') || 'video/mp4';
+    const poster = getParam('poster');
+    const adsTitle = getParam('ads_title');
+    const adsImage = getParam('ads_image');
+    const adsUrl = getParam('ads_url');
 
-  if (encodedLink) {
-    const src = `https://playerv2.kinikita-xyz.workers.dev/?link=${encodedLink}`;
     const video = document.getElementById('player');
-    video.src = src;
-    video.type = format;
 
     if (poster) {
       video.setAttribute('poster', poster);
     }
 
-    const player = new Plyr(video);
-
-    // Tampilkan iklan jika tersedia
-    if (adsImage && adsUrl) {
-      const adBox = document.createElement("div");
-      adBox.innerHTML = `
-        <a href="${adsUrl}" target="_blank" style="display:block;text-align:center;margin:10px auto;">
-          <img src="${adsImage}" alt="${adsTitle || 'Iklan'}" style="max-width:100%;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.15);">
-        </a>
-      `;
-      document.body.insertBefore(adBox, document.body.firstChild);
+    if (encodedLink) {
+      const src = `https://playerv2.kinikita-xyz.workers.dev/?link=${encodedLink}`;
+      video.src = src;
+      video.type = format;
+      new Plyr(video);
+    } else {
+      document.body.innerHTML = "<p style='color:white;text-align:center'>Tidak ada link video</p>";
     }
 
-  } else {
-    document.body.innerHTML = "<p style='color:white;text-align:center'>Tidak ada link video</p>";
-  }
-</script>
+    // Tampilkan iklan jika ada
+    if (adsImage && adsUrl) {
+      const adBox = document.getElementById('adsContainer');
+      adBox.innerHTML = `
+        <a href="${adsUrl}" target="_blank">
+          <img src="${adsImage}" alt="${adsTitle || 'Iklan'}">
+        </a>
+      `;
+    }
+  </script>
 </body>
 </html>
