@@ -37,6 +37,26 @@
     const encodedLink = getParam('link');
     const format = getParam('format') || 'video/mp4';
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const poster = urlParams.get("poster");
+  const adsTitle = urlParams.get("ads_title");
+  const adsImage = urlParams.get("ads_image");
+  const adsUrl = urlParams.get("ads_url");
+
+  if (poster && window.player) {
+    player.poster = poster;
+  }
+
+  if (adsTitle && adsImage && adsUrl) {
+    const adBox = document.createElement("div");
+    adBox.innerHTML = `
+      <a href="${adsUrl}" target="_blank" style="display:block;text-align:center;margin:10px auto;">
+        <img src="${adsImage}" alt="${adsTitle}" style="max-width:100%;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+      </a>
+    `;
+    document.body.insertBefore(adBox, document.body.firstChild); // tampil di atas player
+  }
+
     if (encodedLink) {
       const src = `https://playerv2.kinikita-xyz.workers.dev/?link=${encodedLink}`;
       const video = document.getElementById('player');
@@ -46,6 +66,7 @@
     } else {
       document.body.innerHTML = "<p style='color:white;text-align:center'>Tidak ada link video</p>";
     }
+    
   </script>
 </body>
 </html>
